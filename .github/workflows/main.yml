@@ -1,0 +1,28 @@
+name: Daily Exchange Rate Push
+
+on:
+  schedule:
+    # 這裡設定的是 UTC 時間。台灣時間 09:00 是 UTC 01:00
+    - cron: '0 1 * * *'
+  workflow_dispatch: # 允許手動點擊執行測試
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v3
+
+      - name: 設定 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 安裝依賴
+        run: pip install requests
+
+      - name: 執行匯率抓取與推送
+        env:
+          SERVER_CHAN_SENDKEY: ${{ secrets.SERVER_CHAN_SENDKEY }}
+          WECOM_WEBHOOK: ${{ secrets.WECOM_WEBHOOK }}
+        run: python exchange_rate.py
